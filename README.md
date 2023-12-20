@@ -651,3 +651,38 @@ curl 10.65.8.2:80
 curl 10.65.14.138:443
 ```
 ![Screenshot 2023-12-20 194915](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/113527799/21954421-13d9-45ff-abd9-26ec003d0ced)
+
+## Soal 8
+Karena berbeda koalisi politik, maka subnet dengan masyarakat yang berada pada Revolte dilarang keras mengakses WebServer hingga masa pencoblosan pemilu kepala suku 2024 berakhir. Masa pemilu (hingga pemungutan dan penghitungan suara selesai) kepala suku bersamaan dengan masa pemilu Presiden dan Wakil Presiden Indonesia 2024.
+
+```
+revolte="10.65.14.148/30"
+pemilu_start=$(date -d "2023-10-19T00:00" +"%Y-%m-%dT%H:%M")
+pemilu_end=$(date -d "2024-02-15T00:00" +"%Y-%m-%dT%H:%M")
+
+iptables -A INPUT -p tcp -s $revolte --dport 80 -m time --datestart "$pemilu_start" --datestop "$pemilu_end" -j DROP
+```
+
+## Soal 9
+Sadar akan adanya potensial saling serang antar kubu politik, maka WebServer harus dapat secara otomatis memblokir alamat IP yang melakukan scanning port dalam jumlah banyak (maksimal 20 scan port) di dalam selang waktu 10 menit. 
+(clue: test dengan nmap).
+
+submit command dibawah di webserver:
+```
+iptables -N portscan
+iptables -A INPUT -m recent --name portscan --update --seconds 600 --hitcount 20 -j DROP
+iptables -A FORWARD -m recent --name portscan --update --seconds 600 --hitcount 20 -j DROP
+iptables -A INPUT -m recent --name portscan --set -j ACCEPT
+iptables -A FORWARD -m recent --name portscan --set -j ACCEPT
+```
+
+Lalu lakukan testing terhdapat webserver dari client dengan cara sebagai berikut:
+`10.65.8.2 -c 25`.
+![image](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/113527799/dd8ed607-829d-4615-86df-2e53357dc75f)
+
+## Soal 10
+Karena kepala suku ingin tau paket apa saja yang di-drop, maka di setiap node server dan router ditambahkan logging paket yang di-drop dengan standard syslog level. 
+
+`iptables -A INPUT -j LOG --log-level debug --log-prefix 'Dropped Packet' -m limit --limit 1/second --limit-burst 10`
+
+tambahkan command diatas untuk semua node.
