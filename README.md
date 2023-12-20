@@ -16,6 +16,9 @@ https://docs.google.com/spreadsheets/d/1i99nOF023sdb0iFERJQ4ZItxRdEgZ2EGgY3sLRmk
 - [Rute Subnet](#rute-subnet)
 - [Tree VLSM](#tree-vlsm)
 - [Pembagian IP](#pembagian-ip-vlsm)
+- [Konfigurasi](#konfigurasi)
+- [IP Subnet Client](#ip-subnet-client)
+- [SOAL](#soal)
 
 # Topologi
 ### GNS3 | VLSM |
@@ -413,3 +416,22 @@ service rsyslog start
 service isc-dhcp-server status
 ```
 
+### DHCP Relay
+Gunakan script dibawah pada seluruh node router.
+```
+apt update
+apt-get install isc-dhcp-relay rsyslog -y
+
+echo "
+SERVERS=\"10.65.14.150\"
+INTERFACES=\"eth0 eth1 eth2\"
+OPTIONS=\"\"" >/etc/default/isc-dhcp-relay
+
+service rsyslog start
+service isc-dhcp-relay restart
+service isc-dhcp-relay status
+```
+
+# SOAL
+## Soal 1
+...
