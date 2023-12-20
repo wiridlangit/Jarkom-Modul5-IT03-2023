@@ -191,7 +191,7 @@ iface eth0 inet static
 ```
 
 ### Client
-- GrobeForest, LaubHills, SchwerMountain
+- GrobeForest
 ```
 # config for eth0
 auto eth0
@@ -221,4 +221,64 @@ iface eth0 inet dhcp
 auto eth0
 iface eth0 inet dhcp
     gateway 10.65.14.1
+```
+
+# Routing
+- Aura
+```
+# A2
+route add -net 10.65.0.0 netmask 255.255.248.0 gw 10.65.14.130
+# A1 
+route add -net 10.65.8.0 netmask 255.255.252.0 gw 10.65.14.130
+
+# A5 
+route add -net 10.65.14.136 netmask 255.255.255.252 gw 10.65.14.134
+# A7 
+route add -net 10.65.12.0 netmask 255.255.254.0 gw 10.65.14.134
+# A8 
+route add -net 10.65.14.0 netmask 255.255.255.128 gw 10.65.14.134
+# A9 
+route add -net 10.65.14.144 netmask 255.255.255.252 gw 10.65.14.134
+# A10
+route add -net 10.65.14.148 netmask 255.255.255.252 gw 10.65.14.134
+```
+
+- Heiter
+```
+# A3
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.65.14.129
+```
+
+- Frieren
+```
+# A7
+route add -net 10.65.12.0 netmask 255.255.254.0 gw 10.65.14.142
+# A8
+route add -net 10.65.14.0 netmask 255.255.255.128 gw 10.65.14.142
+# A9
+route add -net 10.65.14.144 netmask 255.255.255.252 gw 10.65.14.142
+# A10
+route add -net 10.65.14.148 netmask 255.255.255.252 gw 10.65.14.142
+# A2
+route add -net 10.65.0.0 netmask 255.255.248.0 gw 10.65.14.133
+# A1
+route add -net 10.65.8.0 netmask 255.255.248.0 gw 10.65.14.133
+
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.65.14.133
+```
+
+- Himmel
+```
+# A9
+route add -net 10.65.14.144 netmask 255.255.255.252 gw 10.65.14.3
+# A10
+route add -net 10.65.14.148 netmask 255.255.255.252 gw 10.65.14.3
+# A6
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.65.14.141
+```
+
+- Fern
+```
+# A8
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.65.14.1
 ```
