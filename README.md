@@ -434,4 +434,160 @@ service isc-dhcp-relay status
 
 # SOAL
 ## Soal 1
-...
+Agar topologi yang kalian buat dapat mengakses keluar, kalian diminta untuk mengkonfigurasi Aura menggunakan iptables, tetapi tidak ingin menggunakan MASQUERADE
+
+Lakukan konfigurasi iptables pada
+
+### Aura
+```
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.128/30 --to-source 192.168.122.2
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.132/30 --to-source 192.168.122.2
+```
+
+### Frieren
+```
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.140/30 --to-source 10.65.14.134
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.136/30 --to-source 10.65.14.134
+```
+
+### Heiter
+```
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.0.0/21 --to-source 10.65.14.130
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.8.0/22 --to-source 10.65.14.130
+```
+
+### Himmel
+```
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.0/25 --to-source 10.65.14.142
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.12.0/23 --to-source 10.65.14.142
+```
+
+### Fern
+```
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.144/30 --to-source 10.65.14.3
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.65.14.148/30 --to-source 10.65.14.3
+```
+
+### Testing Soal 1
+Untuk testing apakah sudah bisa akses keluar, dilakukan ping google.com pada setiap node
+
+Uji coba ping pada SchwerMountains
+
+![image6](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/35c1604f-95db-4f9c-a878-a79657dcd46f)
+
+Uji coba ping pada Fern
+
+![image12](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/b8bb0a45-f2d1-4dd9-bedb-3e97fa17e420)
+
+
+## Soal 2
+Kalian diminta untuk melakukan drop semua TCP dan UDP kecuali port 8080 pada TCP.
+
+Jalankan command berikut pada **LaubHills**
+```
+iptables -F
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
+iptables -A INPUT -p tcp -j DROP
+iptables -A INPUT -p udp -j DROP
+```
+### Testing Soal 2
+Pada **SchwerMountain**, jalankan command `nmap -p 80 10.65.12.2`. Dapat dilihat bahwa STATE nya adalah filtered untuk port 80
+
+![image7](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/b8810858-bc7f-4325-b49b-09d213bf2c93)
+
+
+Lalu, coba jalankan command `nmap -p 8080 10.65.12.2`. Dapat dilihat bahwa STATE nya adalah closed pada port 8080, di mana artinya koneksi terhubung tetapi tidak ada layanan yang aktif 
+
+![image14](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/534513b7-0f91-414c-949e-d530ac86c61e)
+
+## Soal 3
+Kepala Suku North Area meminta kalian untuk membatasi DHCP dan DNS Server hanya dapat dilakukan ping oleh maksimal 3 device secara bersamaan, selebihnya akan di drop.
+
+Jalankan command berikut pada **REVOLTE** dan **RICHTER** (sebagai DHCP dan DNS Server)
+
+```
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
+```
+### Testing Soal 3
+Lakukan ping ke Revolte dari keempat client
+
+Ping 1 Device
+
+![image3](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/c591fd64-110b-4e98-8c13-8f31f5bd8fea)
+
+Ping 2 Device
+
+![image10](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/756d6d09-f13b-4664-ad74-6fcd21f6425a)
+
+Ping 3 Device
+
+![image16](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/f34482d9-b0a7-47c5-b5b3-4901b6c10c6b)
+
+Ping 4 Device 
+
+![image8](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/e3019b65-c459-4bce-83eb-af7bafe45ef1)
+
+Dapat dilihat bahwa pada GrobeForest sudah tidak dapat melakukan ping, dikarenakan ping sudah dijalankan secara bersamaan di ketiga client lainnya.
+
+## Soal 4
+Lakukan pembatasan sehingga koneksi SSH pada Web Server hanya dapat dilakukan oleh masyarakat yang berada pada GrobeForest.
+
+Jalankan command berikut pada **SEIN** dan **STARK**
+
+```
+iptables -A INPUT -p tcp --dport 22 -s 10.65.8.0/22 -j ACCEPT
+```
+
+### Testing Soal 4
+Pada **Sein**, jalankan command berikut untuk membuka koneksi port SSH
+```
+nc -l -p 22
+```
+Lakukan testing di **GrobeForest**. GrobeForest berhasil terhubung ke Sein melalui telnet
+
+![image11](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/f11450df-f837-4eba-9e26-28f1f2c7847c)
+
+Lakukan testing di **TurkRegion**. TurkRegion tidak berhasil terhubung ke Sein dan mengalami Connection refused.
+
+![image1](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/8bfed818-4d25-413a-8d8f-d80f7b97cb9d)
+
+## Soal 5
+Selain itu, akses menuju WebServer hanya diperbolehkan saat jam kerja yaitu Senin-Jumat pada pukul 08.00-16.00.
+
+Jalankan command berikut pada **SEIN** dan **STARK**
+```
+iptables -A INPUT -p tcp --dport 22 -s 10.65.8.0/22 -m time --timestart 08:00 --timestop 16:00 --weekdays Mon,Tue,Wed,Thu,Fri -j ACCEPT
+```
+
+### Testing Soal 5
+Pada **LaubHills**, lakukan ping pada saat Rabu Jam 12 Siang. Ping dapat dilakukan karena merupakan jam kerja. 
+
+![image13](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/8ca5e318-7701-419d-9372-08110ae1a5fc)
+
+Lakukan ping kembali pada saat Rabu Jam 8 Malam. Ping gagal karena jam kerja sudah berakhir.
+
+![image15](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/9bfb962a-97d7-4a11-b0aa-d6eb659a3282)
+
+## Soal 6
+Lalu, karena ternyata terdapat beberapa waktu di mana network administrator dari WebServer tidak bisa stand by, sehingga perlu ditambahkan rule bahwa akses pada hari Senin - Kamis pada jam 12.00 - 13.00 dilarang (istirahat maksi cuy) dan akses di hari Jumat pada jam 11.00 - 13.00 juga dilarang (maklum, Jumatan rek).
+
+Jalankan command berikut pada **SEIN** dan **STARK** 
+
+```
+iptables -A INPUT -p tcp --dport 22 -s 10.65.8.0/22 -m time --timestart 12:00 --timestop 13:00 --weekdays Mon,Tue,Wed,Thu -j DROP
+iptables -A INPUT -p tcp --dport 22 -s 10.65.8.0/22 -m time --timestart 11:00 --timestop 13:00 --weekdays Fri -j DROP
+
+iptables -A INPUT -p tcp --dport 22 -j
+```
+
+### Testing Soal 6
+Pada **LaubHills**, lakukan ping pada saat Rabu Jam 12.30 Siang. Ping gagal karena memasuki jam istirahat.
+
+![image9](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/a31b72ec-a0bf-4dfd-8a14-94c53c54b30f)
+
+Lakukan ping kembali pada saat Jumat Jam 11 Siang. Ping gagal karena memasuki jam sholat jumat.
+
+![image4](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/2e5eda85-a8f3-47ee-af2c-f78eaefd807e)
+
