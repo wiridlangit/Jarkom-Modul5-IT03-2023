@@ -591,3 +591,63 @@ Lakukan ping kembali pada saat Jumat Jam 11 Siang. Ping gagal karena memasuki ja
 
 ![image4](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/103043684/2e5eda85-a8f3-47ee-af2c-f78eaefd807e)
 
+## Soal 7
+Karena terdapat 2 WebServer, kalian diminta agar setiap client yang mengakses Sein dengan Port 80 akan didistribusikan secara bergantian pada Sein dan Stark secara berurutan dan request dari client yang mengakses Stark dengan port 443 akan didistribusikan secara bergantian pada Sein dan Stark secara berurutan.
+
+Pada node **HEITER** dan **FRIEREN** masukan command sebagai berikut:
+```
+iptables -A PREROUTING -t nat -p tcp --dport 80 -d 10.69.8.2 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.69.8.2
+iptables -A PREROUTING -t nat -p tcp --dport 80 -d 10.69.8.2 -j DNAT --to-destination 10.69.14.138
+iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.69.14.138 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.69.14.138
+iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.69.14.138 -j DNAT --to-destination 10.69.8.2
+```
+
+Lalu lakukan konfigurasi sebagai berikut pada web server:
+1. Install apache2 dengan `apt install apache2 -y`.
+2. Lakukan konfigurasi pada `/etc/apache2/ports.conf` sebagai berikut:
+```
+Listen 80
+Listen 443
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 443
+</IfModule>
+```
+3. Lakukan konfigurasi pada `/var/www/html/index.html` menjadi sesuatu yang menandakan node yang sedang ditujukan **Sein** / **Stark**
+4. Lakukan konfigurasi pada `/etc/apache2/sites-available/sein.conf`:
+```
+<VirtualHost *:80>
+    ServerName 10.65.8.2
+    DocumentRoot /var/www/html
+</VirtualHost>
+<VirtualHost *:443>
+    ServerName 10.65.8.2
+    DocumentRoot /var/www/html
+</VirtualHost>
+```
+5. Lakukan konfigurasi pada `/etc/apache2/sites-available/stark.conf`
+```
+<VirtualHost *:80>
+    ServerName 10.65.14.138
+    DocumentRoot /var/www/html
+  #  ErrorLog \${APACHE_LOG_DIR}/error.log
+   # CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+<VirtualHost *:443>
+    ServerName 10.65.14.138
+    DocumentRoot /var/www/html
+  #  ErrorLog \${APACHE_LOG_DIR}/error.log
+  #  CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+```
+
+### Testing Soal 7
+```
+curl 10.65.8.2:80
+curl 10.65.14.138:443
+```
+![Screenshot 2023-12-20 194915](https://github.com/wiridlangit/Jarkom-Modul5-IT03-2023/assets/113527799/21954421-13d9-45ff-abd9-26ec003d0ced)
