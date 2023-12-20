@@ -14,8 +14,8 @@ https://docs.google.com/spreadsheets/d/1i99nOF023sdb0iFERJQ4ZItxRdEgZ2EGgY3sLRmk
 ## Daftar Isi 
 - [Topologi](#topologi)
 - [Rute Subnet](#rute-subnet)
-- [VLSM](#vlsm)
-- [CIDR](#cidr)
+- [Tree VLSM](#tree-vlsm)
+- [Pembagian IP](#pembagian-ip-vlsm)
 
 # Topologi
 ### GNS3 | VLSM |
